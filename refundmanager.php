@@ -275,3 +275,18 @@ function refundmanager_civicrm_post($op, $objectName, $objectId, &$objectRef) {
     }
   }
 }
+
+/**
+ * Implements hook_civicrm_alterMailParams().
+ *
+ *
+ */
+function refundmanager_civicrm_alterMailParams(&$params, $context) {
+  if ($context == 'messageTemplate' && $params['valueName'] == 'contribution_invoice_receipt') {
+    $tplParams =& $params['tplParams'];
+    $contributionID = $tplParams['id'];
+    if (CN::isaCreditNote($contributionID)) {
+      $tplParams['isCreditNote'] = 1;
+    }
+  }
+}
