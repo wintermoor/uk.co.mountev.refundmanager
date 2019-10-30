@@ -74,13 +74,26 @@ class CRM_Refundmanager_CreditNoteTest extends \PHPUnit\Framework\TestCase imple
     $creditNote3 = $this->createCreditNote(['total_amount' => -30]);
     $this->assertEquals($creditNote3['invoice_number'], $creditnotePrefix . $this->_invoiceNum . '_3');
 
+    // Try edit note 1 with higher amount which should fail
+    $creditNote1EditParams = $this->getCreditNoteParams(['contribution_id' => $creditNote1['id'], 'total_amount' => -70]);
+    $creditNote1Edit = $this->callAPIFailure('Contribution', 'create', $creditNote1EditParams);
+
+    // Try edit note 1 with lower amount which should pass
+    $creditNote1Edit = $this->createCreditNote(['contribution_id' => $creditNote1['id'], 'total_amount' => -20]);
+
+    // Try edit note 2 with same amount again which should pass
+    $creditNote2Edit = $this->createCreditNote(['contribution_id' => $creditNote2['id'], 'total_amount' => -20]);
+
+    // Try creating new credit note with higher amount, which should fail
     $creditNote4Params = $this->getCreditNoteParams(['total_amount' => -70]);
     // Fixme: draft a failure message as pushed by api. Taxed Amount needs to be mentioned in the message.
     $creditNote4 = $this->callAPIFailure('Contribution', 'create', $creditNote4Params);
 
+    // Try creating new credit note with +ve amount, which should fail
     $creditNote5Params = $this->getCreditNoteParams(['total_amount' => 10]);
     $creditNote5 = $this->callAPIFailure('Contribution', 'create', $creditNote5Params, 'Credit Note Amount is expected to be -ve');
 
+    // Try creating new credit note with incorrect source contribution_id, which should fail
     $creditNote6Params = $this->getCreditNoteParams(['total_amount' => -10, 'is_creditnote_for' => 1211212121212]);
     $creditNote6 = $this->callAPIFailure('Contribution', 'create', $creditNote6Params, 'Unable to find any information about original payment for the credit note. Make sure is_creditnote_for specifies the correct original contribution ID.');
 

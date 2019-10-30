@@ -201,33 +201,46 @@ function refundmanager_civicrm_buildForm($formName, &$form) {
  * @param array $errors
  */
 function refundmanager_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
-  if ($formName == 'CRM_Contribute_Form_Contribution' && !empty($fields['is_creditnote_for']) && $form->getAction() == CRM_Core_Action::ADD) {
+  $result = [];
+  if ($formName == 'CRM_Contribute_Form_Contribution' && $form->getAction() == CRM_Core_Action::ADD && !empty($fields['is_creditnote_for'])) {
     $totalTaxAmount = CN::addTax($fields['total_amount'], $fields['financial_type_id']);
     $result = CN::validateAmount($totalTaxAmount, $fields['is_creditnote_for']);
-    if (!empty($result['is_error'])) {
-      if (!empty($errors['_qf_default'])) {
-        $errors['_qf_default'] .= $result['error'];
-      } else {
-        $errors['_qf_default'] = $result['error'];
-      }
+  }
+  if ($formName == 'CRM_Contribute_Form_Contribution' && $form->getAction() == CRM_Core_Action::UPDATE) {
+    $totalTaxAmount = CN::addTax($fields['total_amount'], $fields['financial_type_id']);
+    $sourceContributionId = CN::isaCreditNote($fields['id']);
+    if ($sourceContributionId) {
+      $result = CN::validateAmount($totalTaxAmount, $sourceContributionId, $fields['id']);
+    }
+  }
+  if (!empty($result) && !empty($result['is_error'])) {
+    if (!empty($errors['_qf_default'])) {
+      $errors['_qf_default'] .= $result['error'];
+    } else {
+      $errors['_qf_default'] = $result['error'];
     }
   }
 }
 
 function refundmanager_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
   if ($objectName == 'Contribution' && $op == 'contribution.selector.row') {
-    // FIXME: only show it for completed and +ve amount payments.
-    $links[] = array(
-      'name'  => ts('Create Credit Note'),
-      'url'   => 'civicrm/contact/view/contribution',
-      'qs'    => 'reset=1&action=add&cnforid=%%id%%&cid=%%cid%%&context=%%cxt%%',
-      'title' => 'Create a Credit Note',
-      'class' => 'no-popup',
-    );
+    if (!empty($values['id'])) {
+      $contributionTotalAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $values['id'], 'total_amount');
+      if ($contributionTotalAmount > 0) {
+        $links[] = array(
+          'name'  => ts('Create Credit Note'),
+          'url'   => 'civicrm/contact/view/contribution',
+          'qs'    => 'reset=1&action=add&cnforid=%%id%%&cid=%%cid%%&context=%%cxt%%',
+          'title' => 'Create a Credit Note',
+          'class' => 'no-popup',
+        );
+      }
+    }
   }
 }
 
 function refundmanager_civicrm_pre($op, $objectName, $id, &$params) {
+  // For credit note create - validate and populate invoice number
   if ($objectName == 'Contribution' && $op == 'create' && !empty($params['is_creditnote_for'])) {
     $result = CN::getNextInvoiceNum($params['total_amount'], $params['is_creditnote_for']);
     if (!empty($result['is_error'])) {
@@ -237,6 +250,16 @@ function refundmanager_civicrm_pre($op, $objectName, $id, &$params) {
       // use creditnote_id column temporarily to store source contribution id. 
       // So later in post process we could properly store it, when we have the contribution id as well.
       $params['creditnote_id'] = $params['is_creditnote_for'];
+    }
+  }
+  // For credit note update - just validate
+  if ($objectName == 'Contribution' && $op == 'edit') {
+    $sourceContributionId = CN::isaCreditNote($id);
+    if ($sourceContributionId) {
+      $result = CN::getNextInvoiceNum($params['total_amount'], $sourceContributionId, $id);
+      if (!empty($result['is_error'])) {
+        throw new CRM_Core_Exception($result['error']);
+      }
     }
   }
 }
