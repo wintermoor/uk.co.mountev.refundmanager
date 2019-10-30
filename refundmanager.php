@@ -224,7 +224,8 @@ function refundmanager_civicrm_validateForm($formName, &$fields, &$files, &$form
 
 function refundmanager_civicrm_links($op, $objectName, $objectId, &$links, &$mask, &$values) {
   if ($objectName == 'Contribution' && $op == 'contribution.selector.row') {
-    if (!empty($values['id'])) {
+    $creditnotePrefix = CRM_Contribute_BAO_Contribution::checkContributeSettings('credit_notes_prefix', TRUE);
+    if ($creditnotePrefix && !empty($values['id'])) {
       $contributionTotalAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $values['id'], 'total_amount');
       if ($contributionTotalAmount > 0) {
         $links[] = array(
