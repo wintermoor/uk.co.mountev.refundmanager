@@ -52,10 +52,10 @@ class CRM_Refundmanager_CreditNote {
 
   public static function addTax($amount, $financialTypeId) {
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-    $taxRate  = CRM_Utils_Array::value($financialTypeId,  $taxRates, 0);
+    $taxRate  = CRM_Utils_Array::value($financialTypeId, $taxRates, 0);
     $totalTaxAmount = $amount;
     if ($taxRate) {
-      $taxAmount = ($taxRate/100) * $amount;
+      $taxAmount = ($taxRate / 100) * $amount;
       $totalTaxAmount = $amount + $taxAmount;
     }
     return $totalTaxAmount;
@@ -73,7 +73,9 @@ class CRM_Refundmanager_CreditNote {
     }
   }
 
-  // wrapper around getNextInvoiceNum
+  /**
+   * wrapper around getNextInvoiceNum
+   */
   public static function validateAmount($creditNoteAmount, $sourceContributionId, $creditNoteId = NULL) {
     return self::getNextInvoiceNum($creditNoteAmount, $sourceContributionId, $creditNoteId);
   }
@@ -96,31 +98,36 @@ class CRM_Refundmanager_CreditNote {
               $creditTotals = self::getTotalCreditAmount($sourceContributionId, $creditNoteId);
               if ($sourceTotalAmount > 0) {
                 $creditTotals = (($creditNoteAmount * -1) + ($creditTotals * -1));
-                if ( $creditTotals <= $sourceTotalAmount) {
+                if ($creditTotals <= $sourceTotalAmount) {
                   $creditNoteInvoiceNum = self::getNextCreditInvoiceNum($sourceContributionId, $invoiceNum, $creditNoteId);
                   $error = '';
                   $isError = 0;
-                } else {
+                }
+                else {
                   $error = "Cedit note amount ({$creditNoteAmount}) makes total credits so far (-{$creditTotals}) which exceeds the original payment amount ({$sourceTotalAmount}). You may have to consider any taxes. If amount entered is correct, there may be other credit notes for same original payment.";
                 }
-              } else {
+              }
+              else {
                 $error = "Can't create Credit Note for a payment with -ve amount.";
               }
-            } else {
+            }
+            else {
               $error = "Original payment doesn't have an invoice number, which credit note can infer from.";
             }
-          } else {
+          }
+          else {
             $error = "Unable to find any information about original payment for the credit note. Make sure is_creditnote_for specifies the correct original contribution ID.";
           }
-        } else {
+        }
+        else {
           $error = "Credit Note Amount is expected to be -ve";
         }
       }
     }
     return [
-      'is_error' => $isError, 
-      'error'    => $error, 
-      'invoice_number' => $creditNoteInvoiceNum
+      'is_error' => $isError,
+      'error'    => $error,
+      'invoice_number' => $creditNoteInvoiceNum,
     ];
   }
 

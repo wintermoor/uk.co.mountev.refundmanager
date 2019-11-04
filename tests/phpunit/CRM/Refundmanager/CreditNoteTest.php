@@ -2,8 +2,8 @@
 
 require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
 
-use CRM_Refundmanager_ExtensionUtil as E;
 use Civi\Test\EndToEndInterface;
+
 //use CiviUnitTestCase as CU;
 
 /**
@@ -26,7 +26,7 @@ use Civi\Test\EndToEndInterface;
  */
 class CRM_Refundmanager_CreditNoteTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface {
   //use \Civi\Test\Api3DocTrait;
-  use \Civi\Test\Api3TestTrait; // conflicts with Api3DocTrait
+  use \Civi\Test\Api3TestTrait;
   use \Civi\Test\ContactTestTrait;
   use \Civi\Test\GenericAssertionsTrait;
   use \Civi\Test\DbTestTrait;
@@ -199,7 +199,7 @@ class CRM_Refundmanager_CreditNoteTest extends \PHPUnit\Framework\TestCase imple
 
   public function genRandomInvoiceNum($length = 5) {
     $result = '';
-    for($i = 0; $i < $length; $i++) {
+    for ($i = 0; $i < $length; $i++) {
       $result .= mt_rand(0, 9);
     }
     return $result;
@@ -219,4 +219,5 @@ class CRM_Refundmanager_CreditNoteTest extends \PHPUnit\Framework\TestCase imple
     $result = $this->callAPISuccess('contribution', 'delete', $params);
     return $result;
   }
+
 }

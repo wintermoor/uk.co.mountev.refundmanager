@@ -1,13 +1,13 @@
 <?php
 
 require_once 'refundmanager.civix.php';
-use CRM_Refundmanager_ExtensionUtil as E;
+//use CRM_Refundmanager_ExtensionUtil as E;
 use CRM_Refundmanager_CreditNote as CN;
 
 /**
  * Implements hook_civicrm_config().
  *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/ 
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
  */
 function refundmanager_civicrm_config(&$config) {
   _refundmanager_civix_civicrm_config($config);
@@ -149,8 +149,8 @@ function refundmanager_civicrm_themes(&$themes) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_preProcess
  *
-function refundmanager_civicrm_preProcess($formName, &$form) {
-
+ * function refundmanager_civicrm_preProcess($formName, &$form) {
+ *
 } // */
 
 /**
@@ -158,16 +158,16 @@ function refundmanager_civicrm_preProcess($formName, &$form) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu
  *
-function refundmanager_civicrm_navigationMenu(&$menu) {
-  _refundmanager_civix_insert_navigation_menu($menu, 'Mailings', array(
-    'label' => E::ts('New subliminal message'),
-    'name' => 'mailing_subliminal_message',
-    'url' => 'civicrm/mailing/subliminal',
-    'permission' => 'access CiviMail',
-    'operator' => 'OR',
-    'separator' => 0,
-  ));
-  _refundmanager_civix_navigationMenu($menu);
+ * function refundmanager_civicrm_navigationMenu(&$menu) {
+ * _refundmanager_civix_insert_navigation_menu($menu, 'Mailings', array(
+ * 'label' => E::ts('New subliminal message'),
+ * 'name' => 'mailing_subliminal_message',
+ * 'url' => 'civicrm/mailing/subliminal',
+ * 'permission' => 'access CiviMail',
+ * 'operator' => 'OR',
+ * 'separator' => 0,
+ * ));
+ * _refundmanager_civix_navigationMenu($menu);
 } // */
 
 /**
@@ -175,8 +175,6 @@ function refundmanager_civicrm_navigationMenu(&$menu) {
  *
  * Set a default value for an event price set field.
  *
- * @param string $formName
- * @param CRM_Core_Form $form
  */
 function refundmanager_civicrm_buildForm($formName, &$form) {
   if ($formName == 'CRM_Contribute_Form_Contribution') {
@@ -194,11 +192,6 @@ function refundmanager_civicrm_buildForm($formName, &$form) {
 /**
  * Implements hook_civicrm_validateForm().
  *
- * @param string $formName
- * @param array $fields
- * @param array $files
- * @param CRM_Core_Form $form
- * @param array $errors
  */
 function refundmanager_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
   $result = [];
@@ -216,7 +209,8 @@ function refundmanager_civicrm_validateForm($formName, &$fields, &$files, &$form
   if (!empty($result) && !empty($result['is_error'])) {
     if (!empty($errors['_qf_default'])) {
       $errors['_qf_default'] .= $result['error'];
-    } else {
+    }
+    else {
       $errors['_qf_default'] = $result['error'];
     }
   }
@@ -246,9 +240,10 @@ function refundmanager_civicrm_pre($op, $objectName, $id, &$params) {
     $result = CN::getNextInvoiceNum($params['total_amount'], $params['is_creditnote_for']);
     if (!empty($result['is_error'])) {
       throw new CRM_Core_Exception($result['error']);
-    } else if (!empty($result['invoice_number'])) {
+    }
+    elseif (!empty($result['invoice_number'])) {
       $params['invoice_number'] = $result['invoice_number'];
-      // use creditnote_id column temporarily to store source contribution id. 
+      // use creditnote_id column temporarily to store source contribution id.
       // So later in post process we could properly store it, when we have the contribution id as well.
       $params['creditnote_id'] = $params['is_creditnote_for'];
     }
@@ -269,7 +264,7 @@ function refundmanager_civicrm_post($op, $objectName, $objectId, &$objectRef) {
   if ($objectName == 'Contribution' && $op == 'create') {
     if (preg_match('/^CN_/', $objectRef->invoice_number) && !empty($objectRef->creditnote_id)) {
       CN::addEntry($objectRef->creditnote_id, $objectId);
-      // As we dealing with credit note itself, set the core creditnote_id column back to null, 
+      // As we dealing with credit note itself, set the core creditnote_id column back to null,
       // as it's intended for storing credit note, not otherway round.
       CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $objectId, 'creditnote_id', 'NULL');
     }
