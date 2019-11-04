@@ -52,7 +52,6 @@ cv en refundmanager
 * Make sure "Tax and Invoicing" is enabled - https://docs.civicrm.org/user/en/latest/contributions/sales-tax-and-vat.
 * A new option to 'create credit note' would appear on payments listings. Option would only appear if invoicing is turned on and payment has an amount more than zero. Use it to create credit notes.
 ![Screenshot](/images/refund-tab-option.png)
-![Screenshot](/images/refund-search-selector-option.png)
 * Form validation will make sure that the amount entered is -ve and within credit limit.
 ![Screenshot](/images/refund-form-validation1.png)
 ![Screenshot](/images/refund-form-validation2.png)
@@ -60,9 +59,10 @@ cv en refundmanager
 ![Screenshot](/images/refund-on-save1.png)
 * To create credit note from API, specify 'is_creditnote_for' parameter.
 ![Screenshot](/images/refund-api-create.png)
+* API validation pass through same set of validations and would thow any errors if applicable.
 ![Screenshot](/images/refund-api-error.png)
 * Tweak "Contributions - Invoice" message template to make any adjustments per credit note. E.g:
-{if $isCreditNote}{ts}Credit Note{/ts}{else}{ts}INVOICE{/ts}{/if}
+![Screenshot](/images/refund-msg-tpl-tweak1.png)
 ![Screenshot](/images/refund-invoice2.png)
 
 ## Future Improvements
