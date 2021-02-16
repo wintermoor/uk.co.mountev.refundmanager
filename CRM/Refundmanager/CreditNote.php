@@ -82,7 +82,7 @@ class CRM_Refundmanager_CreditNote {
 
   public static function getNextInvoiceNum($creditNoteAmount, $sourceContributionId, $creditNoteId = NULL) {
     $isError = 1;
-    $error = ts('Required parameters for a credit note missing or empty');
+    $error = E::ts('Required parameters for a credit note missing or empty');
     $creditNoteInvoiceNum = '';
     if (!empty($creditNoteAmount) && !empty($sourceContributionId)) {
       if (!empty($sourceContributionId)) {
@@ -104,7 +104,7 @@ class CRM_Refundmanager_CreditNote {
                   $isError = 0;
                 }
                 else {
-                  $error = "Cedit note amount ({$creditNoteAmount}) makes total credits so far (-{$creditTotals}) which exceeds the original payment amount ({$sourceTotalAmount}). You may have to consider any taxes. If amount entered is correct, there may be other credit notes for same original payment.";
+                  $error = "Credit note amount ({$creditNoteAmount}) makes total credits so far (-{$creditTotals}) which exceeds the original payment amount ({$sourceTotalAmount}). You may have to consider any taxes. If amount entered is correct, there may be other credit notes for same original payment.";
                 }
               }
               else {
