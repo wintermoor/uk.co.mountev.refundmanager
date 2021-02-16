@@ -183,7 +183,7 @@ function refundmanager_civicrm_buildForm($formName, &$form) {
       $form->add('hidden', 'is_creditnote_for', $cnForId);
       $invoiceNum = CRM_Contribute_BAO_Contribution::getInvoiceNumber($cnForId);
       if ($form->getAction() == CRM_Core_Action::ADD) {
-        $form->setTitle(ts("Create Credit Note for Payment '%1'", [1 => $invoiceNum]));
+        $form->setTitle(E::ts("Create Credit Note for Payment '%1'", [1 => $invoiceNum]));
       }
     }
   }
@@ -223,10 +223,10 @@ function refundmanager_civicrm_links($op, $objectName, $objectId, &$links, &$mas
       $contributionTotalAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $values['id'], 'total_amount');
       if ($contributionTotalAmount > 0) {
         $links[] = array(
-          'name'  => ts('Create Credit Note'),
+          'name'  => E::ts('Create Credit Note'),
           'url'   => 'civicrm/contact/view/contribution',
           'qs'    => 'reset=1&action=add&cnforid=%%id%%&cid=%%cid%%&context=%%cxt%%',
-          'title' => 'Create a Credit Note',
+          'title' => E::ts('Create a Credit Note'),
           'class' => 'no-popup',
         );
       }
